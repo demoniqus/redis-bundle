@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Demoniqus\CacheBundle\DependencyInjection;
+namespace Demoniqus\RedisBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

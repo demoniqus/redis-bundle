@@ -4,4 +4,10 @@ services:
     autoconfigure: true
     public: false
 
-  Demoniqus\Factory\ServicesFactory: ~
+  Demoniqus\RedisBundle\Service\CacheService:
+    tags:
+      - !php/const Demoniqus\CacheBundle\Interfaces\BundleConstantsModelInterface::CACHE_SERVICE_TAG
+
+  Demoniqus\RedisBundle\Factory\ConnectionsFactory: ~
+
+  Demoniqus\RedisBundle\Factory\ConnectionsFactoryInterface: '@Demoniqus\RedisBundle\Factory\ConnectionsFactory'

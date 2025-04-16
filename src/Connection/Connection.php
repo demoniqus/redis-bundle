@@ -33,6 +33,14 @@ class Connection implements ConnectionInterface
 
     public function put(string $key, $value, ?array $options = []): CacheInterface
     {
+        //TODO Продумать сохранение ассоциативного массива https://ru.hexlet.io/courses/redis-basics/lessons/hashes/theory_unit
+//        $key = $this->generateKey($key);
+//        if (is_array($value)) {
+//            $this->client->hMset($key, $value);
+//
+//            return $this;
+//        }
+
         $this->client->set(
             $this->generateKey($key),
             $this->serializeData($value)
@@ -63,7 +71,7 @@ class Connection implements ConnectionInterface
 
     private function serializeData($value)
     {
-        //TODO реализовать сериализацию данных, если это необходимо
+        //TODO реализовать сериализацию данных, если это необходимо/ Скорее всего отдельные сервисы сами должны подготавливать данные
         return $value;
     }
 }

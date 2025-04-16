@@ -36,7 +36,7 @@ class Connection implements ConnectionInterface
 
     public function get(string $key)
     {
-        $this->client->get($this->generateKey($key));
+        return $this->client->get($this->generateKey($key));
     }
 
     public function has(string $key): bool

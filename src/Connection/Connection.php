@@ -7,9 +7,13 @@ namespace Demoniqus\RedisBundle\Connection;
 use Demoniqus\CacheBundle\Interfaces\Common\CacheInterface;
 use Demoniqus\RedisBundle\Adapter\RedisAdapter;
 use Demoniqus\RedisBundle\Connection\Metadata\MetadataInterface;
+use Demoniqus\RedisBundle\Exception\UnknownClientTypeException;
 
 class Connection implements ConnectionInterface
 {
+    /**
+     * @var \Predis\Client|\Redis|\Symfony\Component\Cache\Traits\RedisProxy
+     */
     private $client;
     private MetadataInterface $metadata;
 
@@ -17,6 +21,9 @@ class Connection implements ConnectionInterface
     {
         $this->client = RedisAdapter::createConnection($dsn, $connectionOptions);
         $this->metadata = $metadata;
+        if (!($this->client instanceof \Redis)) {
+            throw new UnknownClientTypeException('Client must be instance of \\Redis');
+        }
     }
 
     public function getClient()

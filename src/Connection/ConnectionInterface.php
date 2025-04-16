@@ -2,11 +2,15 @@
 
 namespace Demoniqus\RedisBundle\Connection;
 
-interface ConnectionInterface
+use Demoniqus\CacheBundle\Interfaces\Common\CacheInterface;
+
+interface ConnectionInterface extends CacheInterface
 {
     /**
      * @return \Redis
      */
     public function getClient();
+
+
 
 }

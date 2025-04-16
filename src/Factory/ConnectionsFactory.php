@@ -10,36 +10,21 @@ use Demoniqus\RedisBundle\Connection\Metadata\MetadataInterface;
 
 class ConnectionsFactory implements ConnectionsFactoryInterface
 {
-    protected $test = null;
     /**
      * @var ConnectionInterface[]
      */
     private array $connectionsCache = [];
 
-    private array $connectionsMetadata = [];
-
-    public function setConnection (string $alias, MetadataInterface $metadata): void
+    public function createConnection(MetadataInterface $metadata, array $connectionOptions = []): ConnectionInterface
     {
-        $this->connectionsMetadata[$alias] = $metadata;
-    }
+        $dsn = $this->getDsn($metadata);
 
-    public function createConnection(string $connectionAlias, bool $newConnection = false, array $connectionOptions = []): ConnectionInterface
-    {
-        if (!isset($this->connectionsMetadata[$connectionAlias])) {
-            throw new \Exception('Connection "' . $connectionAlias . '" does not defined.');
-
-        }
-
-        if ($newConnection) {
-            return $this->initConnection($this->connectionsMetadata[$connectionAlias]);
-        }
-
-        return $this->connectionsCache[$connectionAlias] ??
-            ($this->connectionsCache[$connectionAlias] = $this->initConnection($this->connectionsMetadata[$connectionAlias]));
+        return $this->connectionsCache[$dsn] ??
+            ($this->connectionsCache[$dsn] = new Connection($dsn, $metadata, $connectionOptions));
 
     }
 
-    private function initConnection(MetadataInterface $metadata, array $connectionOptions = []): ConnectionInterface
+    private function getDsn(MEtadataInterface $metadata): string
     {
         $protocol = '';
         if ($metadata->getProtocol()) {
@@ -51,14 +36,11 @@ class ConnectionsFactory implements ConnectionsFactoryInterface
             $auth = $metadata->getPrefix() . ':' . $metadata->getPassword() . '@';
         }
 
-
         $host = '';
         if ($metadata->getHost() || $metadata->getPort()) {
             $host = $metadata->getHost() . ':' . $metadata->getPort();
         }
 
-        $dsn = $protocol . $auth . $host;
-
-        return new Connection($dsn, $connectionOptions);
+        return $protocol . $auth . $host;
     }
 }

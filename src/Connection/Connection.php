@@ -26,11 +26,6 @@ class Connection implements ConnectionInterface
         }
     }
 
-    public function getClient()
-    {
-        return $this->client;
-    }
-
     public function put(string $key, $value, ?array $options = []): CacheInterface
     {
         //TODO Продумать сохранение ассоциативного массива https://ru.hexlet.io/courses/redis-basics/lessons/hashes/theory_unit
@@ -40,11 +35,19 @@ class Connection implements ConnectionInterface
 //
 //            return $this;
 //        }
-
+        $key = $this->generateKey($key);
+        $this->beginTransaction();
         $this->client->set(
-            $this->generateKey($key),
+            $key,
             $this->serializeData($value)
         );
+
+        if ($options['expiredTime'] ?? null)
+        {
+            $this->expire($key, $options['expiredTime']);
+        }
+
+        $this->commit();
 
         return $this;
     }
@@ -54,15 +57,29 @@ class Connection implements ConnectionInterface
         return $this->client->get($this->generateKey($key));
     }
 
+    public function beginTransaction(): ConnectionInterface
+    {
+        $this->client->multi();
+
+        return $this;
+    }
+
+    public function commit(): void
+    {
+        $this->client->exec();
+    }
+
     public function has(string $key): bool
     {
-        return  (bool)$this->client->keys($this->generateKey($key));
+        return (bool)$this->client->keys($this->generateKey($key));
 
     }
 
     public function delete(string $key): CacheInterface
     {
-        // TODO: Implement delete() method.
+        $this->client->del($this->generateKey($key));
+
+        return $this;
     }
 
     private function generateKey(string $key): string {
@@ -73,5 +90,41 @@ class Connection implements ConnectionInterface
     {
         //TODO реализовать сериализацию данных, если это необходимо/ Скорее всего отдельные сервисы сами должны подготавливать данные
         return $value;
+    }
+
+    public function eval(string $script, array $args = [], int $num_keys = 0)
+    {
+        return $this->client->eval($script, $args, $num_keys);
+    }
+
+    public function hMSet(string $key, array $values, ?array $options): ConnectionInterface
+    {
+        $this->client->hMSet($this->generateKey($key), $values);
+
+        return $this;
+    }
+
+    public function hSet(string $key, string $member, $value): ConnectionInterface
+    {
+        $this->client->hSet($this->generateKey($key), $member, $value);
+
+        return $this;
+    }
+
+    public function hGet(string $key, string $member)
+    {
+        return $this->client->hGet($this->generateKey($key), $member);
+    }
+
+    public function hGetAll(string $key)
+    {
+        return $this->client->hGetAll($this->generateKey($key));
+    }
+
+    public function expire(string $key, int $timeout, ?string $mode = null): ConnectionInterface
+    {
+        $this->client->expire($this->generateKey($key), $timeout);
+
+        return $this;
     }
 }

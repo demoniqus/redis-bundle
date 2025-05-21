@@ -8,6 +8,7 @@ use Demoniqus\CacheBundle\Interfaces\Common\CacheInterface;
 use Demoniqus\RedisBundle\Adapter\RedisAdapter;
 use Demoniqus\RedisBundle\Connection\Metadata\MetadataInterface;
 use Demoniqus\RedisBundle\Exception\UnknownClientTypeException;
+use Demoniqus\RedisBundle\Interfaces\Common\OptionsModelInterface;
 
 class Connection implements ConnectionInterface
 {
@@ -36,18 +37,18 @@ class Connection implements ConnectionInterface
 //            return $this;
 //        }
         $key = $this->generateKey($key);
-        $this->beginTransaction();
-        $this->client->set(
-            $key,
-            $this->serializeData($value)
-        );
 
-        if ($options['expiredTime'] ?? null)
-        {
-            $this->expire($key, $options['expiredTime']);
+
+        if ($options[OptionsModelInterface::EXPIRE_TIME] ?? null)
+            {
+                $this->client->setex($key, $options[OptionsModelInterface::EXPIRE_TIME], $this->serializeData($value));
+            }
+        else {
+            $this->client->set(
+                $key,
+                $this->serializeData($value)
+            );
         }
-
-        $this->commit();
 
         return $this;
     }

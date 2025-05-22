@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the package ITE product.
+ *
+ * Developer list:
+ * (c) Dmitry Antipov <demoniqus@mail.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Demoniqus\RedisBundle\Connection\Metadata;
 
 class Metadata implements MetadataInterface
@@ -11,14 +21,12 @@ class Metadata implements MetadataInterface
     private ?int $port;
 
     public function __construct(
-        ?string $protocol = null,
-        ?string $prefix = null,
-        ?string $password = null,
-        ?string $host = null,
-        ?int $port = null
-
+        string $protocol = null,
+        string $prefix = null,
+        string $password = null,
+        string $host = null,
+        int $port = null
     ) {
-
         $this->protocol = $protocol;
         $this->prefix = $prefix;
         $this->password = $password;
@@ -50,5 +58,4 @@ class Metadata implements MetadataInterface
     {
         return $this->password;
     }
-
 }

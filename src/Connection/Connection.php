@@ -1,8 +1,16 @@
 <?php
 
+/*
+ * This file is part of the package ITE product.
+ *
+ * Developer list:
+ * (c) Dmitry Antipov <demoniqus@mail.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Demoniqus\RedisBundle\Connection;
-
-
 
 use Demoniqus\CacheBundle\Interfaces\Common\CacheInterface;
 use Demoniqus\RedisBundle\Adapter\RedisAdapter;
@@ -38,12 +46,9 @@ class Connection implements ConnectionInterface
 //        }
         $key = $this->generateKey($key);
 
-
-        if ($options[OptionsModelInterface::EXPIRE_TIME] ?? null)
-            {
-                $this->client->setex($key, $options[OptionsModelInterface::EXPIRE_TIME], $this->serializeData($value));
-            }
-        else {
+        if ($options[OptionsModelInterface::EXPIRE_TIME] ?? null) {
+            $this->client->setex($key, $options[OptionsModelInterface::EXPIRE_TIME], $this->serializeData($value));
+        } else {
             $this->client->set(
                 $key,
                 $this->serializeData($value)
@@ -72,8 +77,7 @@ class Connection implements ConnectionInterface
 
     public function has(string $key): bool
     {
-        return (bool)$this->client->keys($this->generateKey($key));
-
+        return (bool) $this->client->keys($this->generateKey($key));
     }
 
     public function delete(string $key): CacheInterface
@@ -83,8 +87,9 @@ class Connection implements ConnectionInterface
         return $this;
     }
 
-    private function generateKey(string $key): string {
-        return $this->metadata->getPrefix() . ':' . $key;
+    private function generateKey(string $key): string
+    {
+        return $this->metadata->getPrefix().':'.$key;
     }
 
     private function serializeData($value)
@@ -122,7 +127,7 @@ class Connection implements ConnectionInterface
         return $this->client->hGetAll($this->generateKey($key));
     }
 
-    public function expire(string $key, int $timeout, ?string $mode = null): ConnectionInterface
+    public function expire(string $key, int $timeout, string $mode = null): ConnectionInterface
     {
         $this->client->expire($this->generateKey($key), $timeout);
 

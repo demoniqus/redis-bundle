@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the package ITE product.
+ *
+ * Developer list:
+ * (c) Dmitry Antipov <demoniqus@mail.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Demoniqus\RedisBundle\Storage;
 
 use Demoniqus\CacheBundle\Interfaces\Common\CacheStorageInterface;
@@ -15,9 +25,7 @@ class CacheStorage implements CacheStorageInterface
         ConnectionsFactoryInterface $connectionsFactory,
         MetadataInterface $connectionParams,
         array $connectionOptions = []
-    )
-    {
-
+    ) {
         $this->connection = $connectionsFactory->createConnection($connectionParams, $connectionOptions);
     }
 
@@ -38,7 +46,6 @@ class CacheStorage implements CacheStorageInterface
         return $this->connection->has($key);
     }
 
-
     public function delete(string $key): CacheStorageInterface
     {
         $this->connection->delete($key);
@@ -57,6 +64,7 @@ class CacheStorage implements CacheStorageInterface
 
         return $this;
     }
+
     public function hSet(string $key, string $member, $value): CacheStorageInterface
     {
         $this->connection->hSet($key, $member, $value);
@@ -85,7 +93,8 @@ class CacheStorage implements CacheStorageInterface
     {
         $this->connection->commit();
     }
-    public function expire(string $key, int $timeout, ?string $mode = null): CacheStorageInterface
+
+    public function expire(string $key, int $timeout, string $mode = null): CacheStorageInterface
     {
         $this->connection->expire($key, $timeout, $mode);
 

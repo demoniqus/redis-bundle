@@ -1,12 +1,22 @@
 <?php
 
 declare(strict_types=1);
+
+/*
+ * This file is part of the package ITE product.
+ *
+ * Developer list:
+ * (c) Dmitry Antipov <demoniqus@mail.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Demoniqus\RedisBundle\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RedisProxy;
-
 
 trait RedisTrait
 {
@@ -57,10 +67,9 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: "%s" does not start with "redis://".', $dsn));
         }
         $params = preg_replace_callback('#^redis://(?:([^@]*+)@)?#', function ($m) use (&$auth) {
-
             if (isset($m[1])) {
                 $tmp = explode(':', $m[1]);
-                $auth = count($tmp) > 1 ? $tmp : $m[1];
+                $auth = \count($tmp) > 1 ? $tmp : $m[1];
             }
 
             return 'file://';
@@ -81,7 +90,7 @@ trait RedisTrait
             $scheme = 'unix';
         }
         $params += [
-            'host' => isset($params['host']) ? $params['host'] : $params['path'],
+            'host' => $params['host'] ?? $params['path'],
             'port' => isset($params['host']) ? 6379 : null,
             'dbindex' => 0,
         ];
@@ -226,7 +235,7 @@ trait RedisTrait
             }
 
             $info = $host->info('Server');
-            $info = isset($info['Server']) ? $info['Server'] : $info;
+            $info = $info['Server'] ?? $info;
 
             if (!version_compare($info['redis_version'], '2.8', '>=')) {
                 // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
@@ -346,7 +355,7 @@ trait RedisTrait
             foreach ($connections as $h => $c) {
                 $connections[$h] = $c[0]->exec();
             }
-            foreach ($results as $k => list($h, $c)) {
+            foreach ($results as $k => [$h, $c]) {
                 $results[$k] = $connections[$h][$c];
             }
         } else {
